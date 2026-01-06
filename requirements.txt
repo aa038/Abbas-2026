@@ -1,0 +1,9 @@
+pandas
+numpy
+matplotlib
+pathlib
+scipy
+astropy
+time
+concurrent
+multiprocessing
