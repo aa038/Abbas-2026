@@ -3,8 +3,8 @@ This folder reproduces **Figure 9** from Abbas et al. (2026, ApJ).
 This script marginalises over the fiducial 4D tongue plot, and plots it as a heatmap with the detected and non-detected planets overlaid, and colour-coded.
 
 ## Files
-- `Plot Planets on Tongue Plot.py`  -- Script to generate Fig 8
-- `fig9_TonguePlot-w-Planets.png` -- Output figure for the 2.5e-11 contrast floor (matches Fig 8 in the paper).
+- `Plot Planets on Tongue Plot.py`  -- Script to generate Fig 9
+- `fig9_TonguePlot-w-Planets.png` -- Output figure (matches Fig 9 in the paper).
 
 ## Dependencies
 - Python >3.9  
@@ -16,7 +16,7 @@ This script marginalises over the fiducial 4D tongue plot, and plots it as a hea
 
 
 - These scripts will require additional dependencies:  `scipy`, `multiprocessing`, `concurrent` and the custom built packages `solve_orbit` and `orbituary`.
-- The results of all these scripts are provided as data products in the directory ``Data/Part II - Demographics/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10`. `Plot Planets on Tongue Plot.py` references these and can thus be run directly to reproduce Fig 9.
+- The results of all these scripts are provided as data products in the directory `Data/Part II - Demographics/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10`. `Plot Planets on Tongue Plot.py` references these and can thus be run directly to reproduce Fig 9.
 
 
 ## Important note
