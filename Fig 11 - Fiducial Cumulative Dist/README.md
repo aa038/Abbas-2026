@@ -17,7 +17,7 @@ This folder reproduces **Figure 11** from Abbas et al. (2026, ApJ), and plots th
 
 
 - These scripts will require additional dependencies:  `scipy`, `multiprocessing`, `concurrent` and the custom built packages `solve_orbit` and `orbituary`. In addition, to run the fitter, you will have to install Julia. 
-- The results of all these scripts are provided as data products in the directory `Data/Part II - Demographics/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10`. `CDF Plot.py` references these and can thus be run directly to reproduce Fig 11.
+- The result of `5g. Mock Survey - Code.py` is **NOT PROVIDED** since it exceeds the 200MB file size limit. To remake `fig11_CumulativeDist.png`, `5g. Mock Survey - Code.py` will have to be **RUN FIRST**. It can be run as is without any changes.
 
 
 ## Important note
