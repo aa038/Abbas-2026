@@ -1,0 +1,9 @@
+[project]
+name = "PlotStyle"
+version = "0.1"
+description = "Global plot style tools"
+authors = [{ name = "Asif" }]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
