@@ -29,7 +29,7 @@ def compute_uncertainties(row):
     """
     orbit_df = row["orbit_df"]
 
-    if orbit_df.empty:
+    if not isinstance(orbit_df, pd.DataFrame) or orbit_df.empty:
         return pd.Series({"frac_sma_unc": np.nan, "ecc_unc": np.nan})
     
     sma = orbit_df["sma"].to_numpy()
@@ -50,11 +50,10 @@ def compute_uncertainties(row):
 # ---------------------------------- I/O ------------------------------------ #
 curr_dir = Path(__file__).resolve().parent
 parent_dir = curr_dir.parent
-data_dir = parent_dir / "Data" / "Part I - Observing Cadence"
+data_dir = parent_dir / "Data" / "Part II - Demographics" / "5. Fiducial Case - IWA - 0.06, Contrast = 1e-10"
 
 fit_files = {
-    "Adaptive: $2.5\\times10^{-11}$": data_dir / "4. AC Fits - 2.5e-11.pkl",
-    "Adaptive: $4\\times10^{-11}$"  : data_dir / "4. AC Fits - 4e-11.pkl",
+    "Uniform: $1\\times10^{-10}$": data_dir / "5a. Orbit Fits.pkl"
 }
 # --------------------------------------------------------------------------- #
 
@@ -68,6 +67,18 @@ for label, path in fit_files.items():
     # For more details on this file, see the docstring in Data/Part I - Observing Cadence/4. Orbit Fits.py
     df = pd.read_pickle(path)
 
+    # Identify planets with valid posteriors at epoch 8
+    idx = pd.IndexSlice
+    df_epoch8 = df.loc[idx[:, 8], :]
+
+    valid_epoch8 = df_epoch8["orbit_df"].apply(lambda x: isinstance(x, pd.DataFrame) and len(x) > 0)
+
+    valid_planet_ids = df_epoch8[valid_epoch8].index.get_level_values("PlanetID").unique()
+
+    # Restrict full time series to the same final fitted planet sample
+    df = df.loc[df.index.get_level_values("PlanetID").isin(valid_planet_ids)].copy()
+
+    print(f"{label}: {len(valid_planet_ids)} planets with valid epoch-8 posteriors")
 
     # Fractional uncertainty in sma and ecc for all planets at all epochs, enforced using the apply() function
     df[["frac_sma_unc", "ecc_unc"]] = df.apply(compute_uncertainties, axis=1)
@@ -97,16 +108,14 @@ for label, path in fit_files.items():
 
 axes[0].set_xlabel("Epoch number")
 axes[0].set_ylabel("$\\Delta a\,/\,a$")
-axes[0].set_ylim([1e-4, 0.5])
+axes[0].set_ylim([1e-3, 1])
 axes[0].set_xlim([1, 8])
 axes[1].set_xlabel("Epoch number")
 axes[1].set_ylabel("$\\Delta e$")
-axes[1].set_ylim([1e-4, 0.5])
+axes[1].set_ylim([1e-3, 1])
 axes[1].set_xlim([1, 8])
 axes[0].set_yscale('log')
 axes[1].set_yscale('log')
-
-axes[0].legend()
 
 plt.savefig(curr_dir / "fig8_sma_ecc_precision_vs_epoch", dpi=300, bbox_inches = 'tight')
 plt.show()
