@@ -5,25 +5,14 @@ This script reproduces Fig. 7 from Abbas et al. 2026.
 Accuracy of the fitted sma and ecc after 8 epochs 
 
 Input:
-Takes in the orbit fits for the planets observed through the adaptive cadence 
+Takes in the orbit fits for the planets observed in the fiducial configuration
 
-    4. AC Fits - 2.5e-11.pkl
+    5. Data / Part II - Demographics / 5. Fiducial Case - IWA - 0.06, Contrast = 1e-10 / 5a. Orbit Fits.pkl
 
-    OR
-
-    4. AC Fits - 4e-11.pkl
 
 Output:
-    fig7_recovered_sma_2.5e-11.png
+    fig7_recovered_sma.png
 
-    OR
-
-    fig7_recovered_sma_4e-11.png
-
-    depending on the user's choice of input orbit fits
-
-Notes:
-- 2 contrast floors: 2.5e-11 and 4e-11 for the adaptive cadence
 """
 
 import pandas as pd
@@ -37,51 +26,24 @@ import matplotlib.ticker as ticker
 from PlotStyle import plotStyle
 plotStyle()
 
-def HZ(L):
-   """
-   Calculate inner and outer edges of the habitable zone of a star,
-   based off Kopparappu 2013.
-   """
-   return np.sqrt(L / 1.78), np.sqrt(L / 0.32)
-
-def compute_hz_probability(orbit_df, L):
-   """
-   Compute the fraction of orbital posterior samples within the HZ of a star
-   """
-   # HZ boundaries
-   hz_in, hz_out = HZ(L)
-
-   # Periastron and apastron for all the orbital posteriors
-   peri = orbit_df["sma"] * (1 - orbit_df["ecc"])
-   ap   = orbit_df["sma"] * (1 + orbit_df["ecc"])
-
-   # Boolean mask to check if an orbit is in the HZ
-   inside = (peri > hz_in) & (ap < hz_out)
-
-   # Fraction of HZ orbits
-   return inside.sum() / len(orbit_df)
-
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>> USER-TUNABLE VALUES <<<<<<<<<<<<<<<<<<<<<<<<<<< #
-# Figures 7 and 8 only consider the results from the adaptive cadences
-# That leaves two sets of orbit fits, for the contrast floors 2.5e-11 and 4e-11
-input_orbit_fits = "4. AC Fits - 4e-11.pkl"                  
-#input_orbit_fits = "4. AC Fits - 2.5e-11.pkl"
+# Figures 7 and 8 consider the orbit fits to the 8 epochs spaced 3 months apart case,
+# for the fiducial IWA = 0.06" and contrast floor = 1e-10 case.
+            
+input_orbit_fits = "5a. Orbit Fits.pkl"
 
-fig_title         = "Contrast Floor = $4\\times10^{-11}$"
-#fig_title         = "Contrast Floor = $2.5\\times10^{-11}$"
-
-output_file_name  = "fig7_recovered_sma_4e-11.png"
-#output_file_name  = "fig7_recovered_sma_2.5e-11.png"
+output_file_name  = "fig7_recovered_sma.png"
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
 
 # ---------------------------------- I/O ------------------------------------ #
 curr_dir = Path(__file__).resolve().parent
 parent_dir = curr_dir.parent
-data_dir = parent_dir / "Data" / "Part I - Observing Cadence"
+data_dir = parent_dir / "Data" / "Part II - Demographics" / "5. Fiducial Case - IWA - 0.06, Contrast = 1e-10"
 
 # Planet catalog
-planets_df_dir = data_dir / "1. Planet Catalog.csv"
+planets_df_dir = parent_dir / "Data" / "Planet Generation" / "SAG13 Planet Catalog.csv"
 planets_df     = pd.read_csv(planets_df_dir)
+planets_df     = planets_df[planets_df['P_yr'] < 10]
 planets_df.set_index("PlanetID", inplace=True)
 
 # Fits to the planets in the observing log
@@ -97,6 +59,10 @@ df_fits = pd.read_pickle(fits_path)
 # Therefore, choose only the 8th epoch of observation for all these planets
 idx = pd.IndexSlice
 df_fits = df_fits.loc[idx[:, 8], :]
+
+# Keep only rows with actual orbit posteriors
+df_fits = df_fits[df_fits["orbit_df"].notna()]
+df_fits = df_fits[df_fits["orbit_df"].apply(lambda x: isinstance(x, pd.DataFrame) and len(x) > 0)]
 
 # Grab the planet IDs from the MultiIndex
 planet_ids = df_fits.index.get_level_values("PlanetID")
@@ -115,17 +81,12 @@ fit_ecc = np.empty(len(df_fits))
 
 sma_p16 = np.empty(len(df_fits)); sma_p84 = np.empty(len(df_fits))
 ecc_p16 = np.empty(len(df_fits)); ecc_p84 = np.empty(len(df_fits))
-
-hz_prob = np.empty(len(df_fits))
 # ---------------------------------------------------------------- #
 
 for i, ((pid, epochNum), row) in enumerate(df_fits.iterrows()):
    # The "orbit_df" column contains a dataframe with the full set of orbital posteriors at that epoch
    # This is a datafram inside the parent multiIndex dataframe
    orbit_df = row["orbit_df"]
-   L_star   = row["L_sol"]
-
-   hz_prob[i] = compute_hz_probability(orbit_df, L_star)
 
    # Median and 16th/84th percentiles for sma and ecc for planet i
    # Median sma and ecc
@@ -135,10 +96,6 @@ for i, ((pid, epochNum), row) in enumerate(df_fits.iterrows()):
    # 16/84 percentiles (for asymmetric errorbars)
    sma_p16[i], sma_p84[i] = np.percentile(orbit_df['sma'].values, [16, 84])
    ecc_p16[i], ecc_p84[i] = np.percentile(orbit_df['ecc'].values, [16, 84])
-
-# Boolean mask for planets classified at 95% confidence vs not
-mask_hz95 = hz_prob >= 0.95
-mask_non  = ~mask_hz95
 
 # -----------------------  Error bars in SMA/Ecc  ------------------------ #
 # Shape (2, n_planets)
@@ -153,71 +110,54 @@ ecc_yerr[1] = np.clip(ecc_yerr[1], 0, None)
 # ----------------------------------------------------------------------- #
 
 # -------------  Plot Median SMA and Ecc with error bars  --------------- #
-def eb(ax, x, y, yerr, color, label):
+def eb(ax, x, y, yerr):
    """
    Plot x vs y with vertical error bars, with fixed plot formatting options.
    """
-   ax.errorbar(x, y, yerr=yerr, mfc=color, label=label, 
-               fmt='o', ms=5, elinewidth=1.5, ecolor=color, mec='k', mew=1, capsize=2, alpha=0.95, zorder=2)
+   ax.errorbar(x, y, yerr=yerr, 
+               fmt='o', ms=5, elinewidth=1.5, mec='k', mew=1, capsize=2, alpha=0.95, zorder=2)
 
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-# Colours from the Tableau 10 palette (muted, visually balanced colours)
-# Default green and red are aggressively bright
-# HZ with 95% confidence --> Green, else --> Red
-c_in  = 'tab:green'
-c_out = 'tab:red'
-
 # ------------  SMA (log-log)  ----------- #
 ax = axes[0]
-ax.plot([0.1, 10], [0.1, 10], 'k--', zorder=1)
 
+amin = min(np.nanmin(true_sma), np.nanmin(sma_p16))
+amax = max(np.nanmax(true_sma), np.nanmax(sma_p84))
 
-# Planets detected with >= 95% confidence
-eb(ax, true_sma[mask_hz95], fit_sma[mask_hz95],                 # Axis, x (True SMA), y (Fitted SMA)
-   np.vstack([sma_yerr[0, mask_hz95], sma_yerr[1, mask_hz95]]), # (Lower bound, Upper bound)
-   c_in, f'$HZ \geq 95\% ({mask_hz95.sum()})$')                 # Colour (Green), Label
+ax.set_xlim(0.8 * amin, 1.2 * amax)
+ax.set_ylim(0.8 * amin, 1.2 * amax)
+ax.plot([0.8 * amin, 1.2 * amax], [0.8 * amin, 1.2 * amax], 'k--', zorder=1)
 
-# Planets detected with < 95% confidence
-eb(ax, true_sma[mask_non], fit_sma[mask_non],                   # Axis, x (True SMA), y (Fitted SMA)
-   np.vstack([sma_yerr[0, mask_non], sma_yerr[1, mask_non]]),   # (Lower bound, Upper bound)
-   c_out, f'$HZ < 95\% ({mask_non.sum()})$')                    # Colour (Red), Label
+eb(ax, true_sma, fit_sma,                      # Axis, x (True SMA), y (Fitted SMA)
+   np.vstack([sma_yerr[0,:], sma_yerr[1, :]])) # (Lower bound, Upper bound)
 
 ax.legend(frameon=False)
 ax.set_xscale("log")
 ax.set_yscale("log")
-ax.set_xlim(0.1, 10)
-ax.set_ylim(0.1, 10)
-ax.set_xlabel("True SMA (AU)")
-ax.set_ylabel("Recovered SMA (AU)")
+ax.set_xlabel("Injected $a$ (AU)")
+ax.set_ylabel("Recovered $a$ (AU)")
 # ---------------------------------------- #
 
 # ------------  Ecc (Linear)  ------------ #
 ax = axes[1]
-ax.plot([0, 0.4], [0, 0.4], 'k--', zorder=1)
 
-# Planets detected with >= 95% confidence
-eb(ax, true_ecc[mask_hz95], fit_ecc[mask_hz95],
-   np.vstack([ecc_yerr[0, mask_hz95], ecc_yerr[1, mask_hz95]]),
-   c_in, None)
+emax = 0.6
+ax.plot([0, emax], [0, emax], 'k--', zorder=1)
+ax.set_xlim(0, emax)
+ax.set_ylim(0, emax)
 
-# Planets detected with < 95% confidence
-eb(ax, true_ecc[mask_non], fit_ecc[mask_non],
-   np.vstack([ecc_yerr[0, mask_non], ecc_yerr[1, mask_non]]),
-   c_out, None)
+eb(ax, true_ecc, fit_ecc, np.vstack([ecc_yerr[0, :], ecc_yerr[1, :]]))
 
-ax.set_xlim(0, 0.4)
-ax.set_ylim(0, 0.4)
 ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
 ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.05))
 ax.xaxis.set_major_locator(ticker.MultipleLocator(0.1))
 ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.05))
-ax.set_xlabel("True ecc")
-ax.set_ylabel("Recovered ecc")
+ax.set_xlabel("Injected $e$")
+ax.set_ylabel("Recovered $e$")
 # ---------------------------------------- #
 
-fig.suptitle(fig_title)
 # ----------------------------------------------------------------------- #
 
 plt.savefig(curr_dir / output_file_name, dpi=300, bbox_inches = 'tight')
