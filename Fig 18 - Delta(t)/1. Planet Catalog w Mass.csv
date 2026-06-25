@@ -1,0 +1,2 @@
+PlanetID,HDName,Spec,d_pc,L_sol,M_sol,Rp_Rearth,sma_AU,P_yr,ecc,inc_rad,aop_rad,pan_rad,epp_yr,Mp_Mearth,albedo,HZ
+HD 72905_0,HD 72905,G0.5V Fe-0.5,14.439,0.973,1.080,1,1.629,2,0.200,0.451,5.044,4.279,2034.738,1.087,0.295,False
