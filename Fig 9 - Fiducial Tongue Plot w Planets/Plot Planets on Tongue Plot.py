@@ -95,7 +95,7 @@ im = ax.imshow(completeness_2d,
                cmap=ylrdblu_cmap)
 
 # Smooth and draw contours
-smoothed      = gaussian_filter(completeness_2d, sigma=1.0)
+smoothed      = gaussian_filter(completeness_2d, sigma=2.0)
 star_contours = [1, 5, 10, 20, 40, 60, 80, 90, 95]      # Number of stars for which contour lines are drawn
 
 # Contour definition
@@ -194,6 +194,8 @@ ax.scatter(np.log10(und_exo['P']), np.log10(und_exo['Rp_REarth']),
 
 # --- Soft band to guide the eye for exo-Earth radii ---
 ax.axhspan(np.log10(0.8), np.log10(1.4), color='black', alpha=0.1, zorder=0)
+plt.axhline(y = np.log10(0.8), ls = "--", color = "grey")
+plt.axhline(y = np.log10(1.4), ls = "--", color = "grey")
 
 ax.legend(loc = 'upper left')
 # ------------------------------------------------------------------------------- #
