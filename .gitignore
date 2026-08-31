@@ -1,0 +1,30 @@
+/Data/Part II - Demographics/1. IWA - 0.04, OWA - 1, Contrast = 1e-9/1b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/2. IWA - 0.06, OWA - 1, Contrast = 1e-9/2b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/3. IWA - 0.08, OWA - 1, Contrast = 1e-9/3b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/4. IWA - 0.04, OWA - 1, Contrast = 1e-10/4b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10/5b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10/5g. Mock Survey.csv
+/Data/Part II - Demographics/6. IWA - 0.08, OWA - 1, Contrast = 1e-10/6b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/7. IWA - 0.04, OWA - 1, Contrast = 1e-11/7b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/8. IWA - 0.06, OWA - 1, Contrast = 1e-11/8b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/9. IWA - 0.08, OWA - 1, Contrast = 1e-11/9b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/1. IWA - 0.04, OWA - 1, Contrast = 1e-9/1b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/2. IWA - 0.06, OWA - 1, Contrast = 1e-9/2b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/3. IWA - 0.08, OWA - 1, Contrast = 1e-9/3b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/4. IWA - 0.04, OWA - 1, Contrast = 1e-10/4b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/5. Fiducial Case - IWA - 0.06, Contrast = 1e-10/5b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/6. IWA - 0.08, OWA - 1, Contrast = 1e-10/6b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/7. IWA - 0.04, OWA - 1, Contrast = 1e-11/7b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/8. IWA - 0.06, OWA - 1, Contrast = 1e-11/8b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Exo-Earth Centric ORs/9. IWA - 0.08, OWA - 1, Contrast = 1e-11/9b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Mismatched OR/5b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Mismatched OR/5g. Mock Survey.csv
+/Data/Part II - Demographics/Scaled Occurrence Rates/5. IWA - 0.06, OWA - 1, Contrast = 1e-10/5b. 4D Tongue Plot.npz
+/Data/Part II - Demographics/Scaled Occurrence Rates/5. IWA - 0.06, OWA - 1, Contrast = 1e-10/5c. Orbit Fits.pkl
+/Data/Part II - Demographics/Scaled Occurrence Rates/5. IWA - 0.06, OWA - 1, Contrast = 1e-10/5g. Mock Survey.csv
+
+# Python build / packaging junk
+*.egg-info/
+build/
+dist/
+__pycache__/
